@@ -5,5 +5,5 @@ import message from './message';
 export default {
     session,
     user,
-    message
+    message,
 }

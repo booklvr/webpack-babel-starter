@@ -11,17 +11,6 @@ import routes from './routes';
 
 const app = express();
 
-app.use('/session', routes.session);
-app.use('/users', routes.user);
-app.use('/messages', routes.message)
-
-
-app.use(express.json()); // body-parser - parses incoming request stream and makes it accessible on req.body and exposes it as json
-app.use(express.urlencoded({ extended: true }));  // parses the text as url encoded data (how browsers tend to send form data) and exposes resulting object of keys and values on req.body
-
-app.use(cors()); // add CORS HTTP header to every request by default
-
-
 // MIDDLEWARE
 // * middleware comes first
 app.use((req, res, next) => {
@@ -33,10 +22,23 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use('/session', routes.session);
+app.use('/users', routes.user);
+app.use('/messages', routes.message)
+
+
+app.use(express.json()); // body-parser - parses incoming request stream and makes it accessible on req.body and exposes it as json
+app.use(express.urlencoded({ extended: true }));  // parses the text as url encoded data (how browsers tend to send form data) and exposes resulting object of keys and values on req.body
+
+app.use(cors()); // add CORS HTTP header to every request by default
+
+
+
+
 // SESSION
-app.get('/session', (req, res) => {
-    return res.send(req.context.models.users[req.context.me.id]);
-})
+// app.get('/session', (req, res) => {
+//     return res.send(req.context.models.users[req.context.me.id]);
+// })
 
 // HOMEPAGE
 app.get('/', (req, res) => {
@@ -47,39 +49,39 @@ app.get('/', (req, res) => {
 //     res.send('This is a test');
 // })
 
-app.post('/', (req, res) => {
-   return res.send('Received a POST HTTP method');
-});
+// app.post('/', (req, res) => {
+//    return res.send('Received a POST HTTP method');
+// });
 
-app.put('/', (req, res) => {
-    return res.send('Received a PUT HTTP method');
-});
+// app.put('/', (req, res) => {
+//     return res.send('Received a PUT HTTP method');
+// });
 
-app.delete('/', (req, res) => {
-    return res.send('Recieved a DELETE HTTP method');
-})
+// app.delete('/', (req, res) => {
+//     return res.send('Recieved a DELETE HTTP method');
+// })
 
 
 // USER
-app.get('/users', (req, res) => {
-    return res.send(Object.values(req.context.models.users));
-});
+// app.get('/users', (req, res) => {
+//     return res.send(Object.values(req.context.models.users));
+// });
 
-app.get('/users', (req, res) => {
-    return res.send(req.context.models.users[req.params.userId])
-})
+// app.get('/users', (req, res) => {
+//     return res.send(req.context.models.users[req.params.userId])
+// })
 
-app.post('/users/:userId', (req, res) => {
-    return res.send(users[req.params.userId]);
-});
+// app.post('/users/:userId', (req, res) => {
+//     return res.send(users[req.params.userId]);
+// });
 
-app.put('/users/:Id', (req, res) => {
-    return res.send(`PUT HTTP methodon on user/${req.params.userId} resource`);
-});
+// app.put('/users/:Id', (req, res) => {
+//     return res.send(`PUT HTTP methodon on user/${req.params.userId} resource`);
+// });
 
-app.delete('/users/:userId', (req, res) => {
-    return res.send(`DELETE HTTP methodon on user/${req.params.userId} resource`);
-});
+// app.delete('/users/:userId', (req, res) => {
+//     return res.send(`DELETE HTTP methodon on user/${req.params.userId} resource`);
+// });
 
 // MESSAGES
 // app.get('/messages', (req, res) => {
@@ -102,9 +104,9 @@ app.delete('/users/:userId', (req, res) => {
 //     return res.send(message);
 // });
 
-// // app.put('/users/:Id', (req, res) => {
-// //     return res.send(`PUT HTTP methodon on user/${req.params.userId} resource`);
-// // });
+// app.put('/users/:Id', (req, res) => {
+//     return res.send(`PUT HTTP methodon on user/${req.params.userId} resource`);
+// });
 
 
 // app.delete('/messages/:messageId', (req, res) => {
