@@ -6,28 +6,36 @@ import express from 'express';  //Creates Express Server
 import uuidv4 from 'uuid/v4';
 
 import  { hello } from './my-other-file';
-import { users, messages } from './data';
+import models from './models';
+import routes from './routes';
 
 const app = express();
+
+app.use('/session', routes.session);
+app.use('/users', routes.user);
+app.use('/messages', routes.message)
+
 
 app.use(express.json()); // body-parser - parses incoming request stream and makes it accessible on req.body and exposes it as json
 app.use(express.urlencoded({ extended: true }));  // parses the text as url encoded data (how browsers tend to send form data) and exposes resulting object of keys and values on req.body
 
 app.use(cors()); // add CORS HTTP header to every request by default
 
+
 // MIDDLEWARE
 // * middleware comes first
 app.use((req, res, next) => {
     // do something
-    req.me = users[1];  // pseudo authenticated user
-
-
+    req.context = {
+        models,
+        me: models.users[1] // pseudo authenticated user
+    };
     next();
-})
+});
 
 // SESSION
 app.get('/session', (req, res) => {
-    return res.send(users[req.me.id]);
+    return res.send(req.context.models.users[req.context.me.id]);
 })
 
 // HOMEPAGE
@@ -54,8 +62,12 @@ app.delete('/', (req, res) => {
 
 // USER
 app.get('/users', (req, res) => {
-    return res.send(Object.values(users));
+    return res.send(Object.values(req.context.models.users));
 });
+
+app.get('/users', (req, res) => {
+    return res.send(req.context.models.users[req.params.userId])
+})
 
 app.post('/users/:userId', (req, res) => {
     return res.send(users[req.params.userId]);
@@ -70,36 +82,42 @@ app.delete('/users/:userId', (req, res) => {
 });
 
 // MESSAGES
-app.get('/messages', (req, res) => {
-    return res.send(Object.values(messages));
-});
+// app.get('/messages', (req, res) => {
+//     return res.send(Object.values(req.context.models.messages));
+// });
 
-app.post('/messages', (req, res) => {
-    const id = uuidv4();
-    const message = {
-        id,
-        text: req.body.text,
-        userId: req.me.id
-    };
-    console.log(req.me);
+// app.get('/messages/:messageId', (req, res) => {
+//     return res.send(req.context.models.messages[req.params.messageId]);
+// });
 
-    messages[id] = message;
+// app.post('/messages', (req, res) => {
+//     const id = uuidv4();
+//     const message = {
+//         id,
+//         text: req.body.text,
+//         userId: req.context.me.id,
+//     };
+//     req.context.models.messages[id] = message;
 
-    return res.send(message);
-});
+//     return res.send(message);
+// });
 
-app.put('/users/:Id', (req, res) => {
-    return res.send(`PUT HTTP methodon on user/${req.params.userId} resource`);
-});
+// // app.put('/users/:Id', (req, res) => {
+// //     return res.send(`PUT HTTP methodon on user/${req.params.userId} resource`);
+// // });
 
-app.delete('/messages/:messageId', (req, res) => {
-    const {
-        [req.params.messageId]: message,
-        ...otherMessages
-    } = messages;
 
-    return res.send(message);
-});
+// app.delete('/messages/:messageId', (req, res) => {
+
+//     const {
+//         [req.params.messageId]: message,
+//         ...otherMessages
+//     } = req.context.models.messages;
+
+//     req.context.models.messages = otherMessages;
+
+//     return res.send(message);
+// });
 
 
 
