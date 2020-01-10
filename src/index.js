@@ -5,9 +5,9 @@ import cors from 'cors'; //creates a cors header to prevent "Cross-Origin Reques
 import express from 'express';  //Creates Express Server
 import uuidv4 from 'uuid/v4';
 
-import  { hello } from './my-other-file';
-import models from './models';
 import routes from './routes';
+
+import models, { connectDb } from './models';
 
 const app = express();
 
@@ -30,105 +30,54 @@ app.use('/users', routes.user);
 app.use('/messages', routes.message);
 
 
-
-
 app.use(cors()); // add CORS HTTP header to every request by default
 
+const eraseDataBaseOnSync = true; // re-initialize database every Express server start
 
+connectDb().then(async () => {
 
+     // re-initialize database every Express server start
+    if (eraseDataBaseOnSync) {
+        await Promise.all([
+            models.User.deleteMany({}),
+            models.Message.deleteMany({}),
+        ]);
 
-// SESSION
-// app.get('/session', (req, res) => {
-//     return res.send(req.context.models.users[req.context.me.id]);
-// })
+        createUsersWithMessages();
+    };
 
-// HOMEPAGE
-app.get('/', (req, res) => {
-    return res.send('Received a GET HTTP method');
+    app.listen(process.env.PORT, () => {
+        console.log(`Example app listening on port ${process.env.PORT}!`);
+    });
 });
 
-// app.get('/test', (req, res) => {
-//     res.send('This is a test');
-// })
+const createUsersWithMessages = async () => {
+    const user1 = new models.User({
+        username: 'ndewaal',
+    });
 
-// app.post('/', (req, res) => {
-//    return res.send('Received a POST HTTP method');
-// });
+    const user2 = new models.User({
+        username: 'hadajang',
+    });
 
-// app.put('/', (req, res) => {
-//     return res.send('Received a PUT HTTP method');
-// });
+    const message1 = new models.Message({
+        text: 'Learning how to codoe',
+        user: user1.id,
+    });
 
-// app.delete('/', (req, res) => {
-//     return res.send('Recieved a DELETE HTTP method');
-// })
+    const message2 = new models.Message({
+        text: 'is a little sad today',
+        user: user2.id,
+    });
 
+    const message3 = new models.Message({
+        text: 'is a little sad today',
+        user: user2.id,
+    });
 
-// USER
-// app.get('/users', (req, res) => {
-//     return res.send(Object.values(req.context.models.users));
-// });
+    await message1.save();
+    await message2.save();
+    await message3.save();
 
-// app.get('/users', (req, res) => {
-//     return res.send(req.context.models.users[req.params.userId])
-// })
-
-// app.post('/users/:userId', (req, res) => {
-//     return res.send(users[req.params.userId]);
-// });
-
-// app.put('/users/:Id', (req, res) => {
-//     return res.send(`PUT HTTP methodon on user/${req.params.userId} resource`);
-// });
-
-// app.delete('/users/:userId', (req, res) => {
-//     return res.send(`DELETE HTTP methodon on user/${req.params.userId} resource`);
-// });
-
-// MESSAGES
-// app.get('/messages', (req, res) => {
-//     return res.send(Object.values(req.context.models.messages));
-// });
-
-// app.get('/messages/:messageId', (req, res) => {
-//     return res.send(req.context.models.messages[req.params.messageId]);
-// });
-
-// app.post('/messages', (req, res) => {
-//     const id = uuidv4();
-//     const message = {
-//         id,
-//         text: req.body.text,
-//         userId: req.context.me.id,
-//     };
-//     req.context.models.messages[id] = message;
-
-//     return res.send(message);
-// });
-
-// app.put('/users/:Id', (req, res) => {
-//     return res.send(`PUT HTTP methodon on user/${req.params.userId} resource`);
-// });
-
-
-// app.delete('/messages/:messageId', (req, res) => {
-
-//     const {
-//         [req.params.messageId]: message,
-//         ...otherMessages
-//     } = req.context.models.messages;
-
-//     req.context.models.messages = otherMessages;
-
-//     return res.send(message);
-// });
-
-
-
-// console.log(users);
-
-app.listen(process.env.PORT, () => {
-    console.log(`Example app listening on port ${process.env.PORT}!`);
-});
-
-
+    await user1.save();
+}
