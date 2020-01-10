@@ -22,13 +22,15 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/session', routes.session);
-app.use('/users', routes.user);
-app.use('/messages', routes.message)
-
-
 app.use(express.json()); // body-parser - parses incoming request stream and makes it accessible on req.body and exposes it as json
 app.use(express.urlencoded({ extended: true }));  // parses the text as url encoded data (how browsers tend to send form data) and exposes resulting object of keys and values on req.body
+
+app.use('/session', routes.session);
+app.use('/users', routes.user);
+app.use('/messages', routes.message);
+
+
+
 
 app.use(cors()); // add CORS HTTP header to every request by default
 
